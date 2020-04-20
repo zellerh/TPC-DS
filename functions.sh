@@ -61,7 +61,8 @@ get_version()
 		if [ "$quicklz_test" -eq "1" ]; then
 			SMALL_STORAGE="appendonly=true, orientation=column"
 			MEDIUM_STORAGE="appendonly=true, orientation=column"
-			LARGE_STORAGE="appendonly=true, orientation=column, compresstype=quicklz"
+            # for now, use zlib even with available quicklz, to allow to use open source builds
+			LARGE_STORAGE="appendonly=true, orientation=column, compresstype=zlib"
 		else
 			SMALL_STORAGE="appendonly=true, orientation=column"
 			MEDIUM_STORAGE="appendonly=true, orientation=column"
