@@ -26,18 +26,25 @@ for i in $(ls $PWD/*.tpcds.*.sql); do
 		id=`echo $i | awk -F '.' '{print $1}'`
 		schema_name=`echo $i | awk -F '.' '{print $2}'`
 		table_name=`echo $i | awk -F '.' '{print $3}'`
+		myfilename=$(basename $i)
 		start_log
 		if [ "$EXPLAIN_ANALYZE" == "false" ]; then
 			echo "psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"\" -f $i | wc -l"
 			tuples=$(psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE="" -f $i | wc -l; exit ${PIPESTATUS[0]})
 		else
-			myfilename=$(basename $i)
 			mylogfile=$PWD/../log/$myfilename.single.explain_analyze.log
 			echo "psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE=\"EXPLAIN ANALYZE\" -f $i > $mylogfile"
 			psql -v ON_ERROR_STOP=1 -A -q -t -P pager=off -v EXPLAIN_ANALYZE="EXPLAIN ANALYZE" -f $i > $mylogfile
 			tuples="0"
 		fi
 		log $tuples
+
+		# also capture explain (not timed) when running the queries
+		if [ "$EXPLAIN_ANALYZE" == "false" ]; then
+			mylogfile=$PWD/../log/$myfilename.single.explain.log
+			echo "psql -v ON_ERROR_STOP=1 -A -q -e -t -P pager=off -v EXPLAIN_ANALYZE=\"EXPLAIN\" -f $i > $mylogfile"
+			psql -v ON_ERROR_STOP=1 -A -q -e -t -P pager=off -v EXPLAIN_ANALYZE="EXPLAIN" -f $i > $mylogfile
+		fi
 	done
 done
 
