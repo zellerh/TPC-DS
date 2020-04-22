@@ -20,7 +20,7 @@ fi
 step=sql
 init_log $step
 
-rm -f $PWD/../log/*single.explain_analyze.log
+rm -f $PWD/../log/*single.explain*.log
 for i in $(ls $PWD/*.tpcds.*.sql); do
 	for x in $(seq 1 $SINGLE_USER_ITERATIONS); do
 		id=`echo $i | awk -F '.' '{print $1}'`
@@ -42,7 +42,6 @@ for i in $(ls $PWD/*.tpcds.*.sql); do
 		# also capture explain (not timed) when running the queries
 		if [ "$EXPLAIN_ANALYZE" == "false" ]; then
 			mylogfile=$PWD/../log/$myfilename.single.explain.log
-			echo "psql -v ON_ERROR_STOP=1 -A -q -e -t -P pager=off -v EXPLAIN_ANALYZE=\"EXPLAIN\" -f $i > $mylogfile"
 			psql -v ON_ERROR_STOP=1 -A -q -e -t -P pager=off -v EXPLAIN_ANALYZE="EXPLAIN" -f $i > $mylogfile
 		fi
 	done
